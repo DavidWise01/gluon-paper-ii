@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gluon Papers · II — The Geometry the Weights Carry</title>
+<style>
+  :root{
+    --void:#14181F; --void-2:#1B2027; --void-3:#222A33;
+    --ink:#E9E5D9; --ink-soft:#969DA7;
+    --brass:#C9A24B; --brass-br:#E0BD64;
+    --rule:#2C333D; --rule-2:#3A434F;
+    --cr:#C65A4E; --cg:#5FA86B; --cb:#5B86C4;
+    --colorless:#EDE9DD;
+    --lit:#6FB87E; --bri:#C9A24B; --spec:#D2705F;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--void);color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    font-size:18px;line-height:1.58;-webkit-font-smoothing:antialiased}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 30px}
+
+  header.mast{padding:54px 0 30px;border-bottom:2px solid var(--brass)}
+  .series{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--brass);margin:0 0 22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .series b{color:var(--ink-soft);font-weight:400}
+  h1{font-size:clamp(27px,4.6vw,42px);line-height:1.08;margin:0;font-weight:600;letter-spacing:.005em}
+  .abstract{max-width:62ch;margin:18px 0 0;font-size:18px}
+  .priorlink{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:var(--ink-soft);margin:14px 0 0}
+  .byline{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.06em;color:var(--ink-soft);margin:8px 0 0}
+
+  .sig{margin:30px 0 0;padding:20px 20px 14px;background:var(--void-2);border:1px solid var(--rule-2)}
+  .sig svg{display:block;width:100%;height:auto}
+  .sig .cap{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-soft);margin:10px 2px 0;line-height:1.5}
+  .sig .cap b{color:var(--brass);font-weight:600}
+  .sig .cap .x{color:var(--cb);font-weight:600}
+  .terrain{stroke:var(--brass);stroke-width:2.4;fill:none}
+  .perturb{stroke:var(--cb);stroke-width:1.8;fill:none;stroke-dasharray:4 3}
+  .ball{fill:var(--colorless)}
+  .arr{stroke:var(--cb);stroke-width:1.6;fill:none}
+  .lab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--ink-soft)}
+  .lab-g{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--brass);font-weight:700}
+  .lab-b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--cb);font-weight:700}
+  @media (prefers-reduced-motion:no-preference){
+    .perturb{animation:rip 3.8s ease-in-out infinite}
+    @keyframes rip{0%,100%{opacity:.7}50%{opacity:1}}
+  }
+
+  .legend{margin:26px 0 0;display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+  .legend .lt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-right:2px}
+  .schip{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border:1px solid;background:transparent;cursor:pointer}
+  .schip[data-s="lit"]{color:var(--lit);border-color:var(--lit)}
+  .schip[data-s="bri"]{color:var(--bri);border-color:var(--bri)}
+  .schip[data-s="spec"]{color:var(--spec);border-color:var(--spec)}
+  .schip[aria-pressed="false"]{opacity:.38}
+  .legend .hint{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;color:var(--ink-soft)}
+
+  section{padding:34px 0;border-bottom:1px solid var(--rule)}
+  .snum{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--brass);letter-spacing:.18em}
+  h2{font-size:clamp(19px,3vw,25px);margin:4px 0 0;font-weight:600;letter-spacing:.01em}
+  h2 .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-left:10px;font-weight:400}
+  section p{margin:14px 0 0;max-width:66ch}
+  .central{border-left:3px solid var(--brass)}
+
+  .formal{margin:16px 0 0;padding:13px 16px;background:var(--void-3);border:1px solid var(--rule-2);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;line-height:1.7}
+  .formal .eq{font-size:16px;color:var(--ink)}
+  .formal .gl{color:var(--ink-soft);font-size:12.5px}
+  .restated{margin:13px 0 0;padding:11px 15px;background:var(--void-2);border-left:3px solid var(--rule-2);font-size:15.5px}
+  .restated b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:400;display:block;margin-bottom:4px}
+
+  .tags{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border:1px solid}
+  .tag.lit{color:var(--lit);border-color:var(--lit)}
+  .tag.bri{color:var(--bri);border-color:var(--bri)}
+  .tag.spec{color:var(--spec);border-color:var(--spec)}
+  .test{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;padding-left:14px;border-left:2px solid var(--rule-2)}
+  .test b{color:var(--brass);font-weight:600}
+  .dim{opacity:.22;transition:opacity .2s ease}
+
+  .fig{margin:30px 0 6px;padding:22px 18px 14px;background:var(--void-2);border:1px solid var(--rule-2)}
+  .fig svg{display:block;width:100%;height:auto}
+  .fig .figcap{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ink-soft);margin:12px 4px 0;line-height:1.55}
+  .axisline{stroke:var(--rule-2);stroke-width:1.4}
+  .well{stroke:var(--brass);stroke-width:2.6;fill:none}
+  .pball{fill:var(--colorless)}
+  .push{stroke:var(--cb);stroke-width:2;fill:none}
+  .wall{stroke:var(--cr);stroke-width:2;fill:none;stroke-dasharray:5 4}
+  .access{stroke:var(--cb);stroke-width:2;fill:none}
+  .grad{stroke:var(--brass);stroke-width:1.6;fill:none}
+  .flab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--ink)}
+  .flab-s{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--ink-soft)}
+  .flab-r{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--cr)}
+  .flab-b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--cb)}
+
+  .closer{padding:34px 0 0;border-bottom:0}
+  .closer p{font-size:19px;max-width:64ch}
+  .closer .em{font-style:italic}
+
+  footer{padding:30px 0 80px;color:var(--ink-soft);font-size:13.5px;line-height:1.6}
+  footer p{margin:0 0 12px;max-width:72ch}
+  footer b{color:var(--ink);font-weight:600}
+
+  @media (max-width:600px){ body{font-size:17px} .series{font-size:11px;letter-spacing:.2em} .formal{font-size:13.5px} }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <p class="series"><span>Gluon Papers · II</span><b>chromodynamic series · release</b></p>
+    <h1>The Geometry the Weights Carry</h1>
+    <p class="abstract">Paper I left a self-sourcing field that does not travel through geometry but makes it. So the curvature a forward pass crosses splits in two: what training built, fixed in the weights before a single token arrives, and what the prompt adds on top. This paper decomposes the interior — the terrain and the ripple — and finds why some behaviors hold against any prompt while others flip, and why a probe from outside can read the slope but never the ground.</p>
+    <p class="priorlink mono">↳ continues Gluon Papers · I — The Confined Interior · resolves its closing hook on curvature</p>
+    <p class="byline mono">Bridge-Burners LLC · Fiddler · intrinsic vs extrinsic curvature · anchor: AKASHA</p>
+
+    <div class="sig" aria-label="An intrinsic terrain of wells, a small extrinsic perturbation added, and the pass following the sum">
+      <svg viewBox="0 0 760 210" role="img" aria-label="A brass terrain with a deep well and a shallow well, a dashed blue perturbation added on top, and two parchment balls — one held deep, one nudged from the shallow well">
+        <text class="lab-g" x="20" y="26">intrinsic — built by training, fixed in θ</text>
+        <!-- intrinsic terrain: ridge, deep well, ridge, shallow well -->
+        <path class="terrain" d="M 30 70 Q 130 70 180 150 Q 215 196 250 150 Q 300 70 380 92 Q 470 110 520 150 Q 545 176 570 150 Q 640 96 730 96"/>
+        <!-- extrinsic perturbation overlaid -->
+        <path class="perturb" d="M 30 60 Q 130 60 180 140 Q 215 178 250 138 Q 300 56 380 80 Q 470 96 520 132 Q 545 150 570 132 Q 640 84 730 84"/>
+        <text class="lab-b" x="600" y="60">+ extrinsic — added by the prompt</text>
+        <!-- ball held in deep well -->
+        <circle class="ball" cx="215" cy="178" r="9"/>
+        <text class="lab" x="215" y="205" text-anchor="middle">held · deep well</text>
+        <!-- ball nudged out of shallow well -->
+        <circle class="ball" cx="548" cy="166" r="9"/>
+        <path class="arr" d="M 558 162 Q 590 150 612 132"/>
+        <text class="lab" x="600" y="190" text-anchor="middle">nudged · shallow well</text>
+      </svg>
+      <p class="cap">The <b>terrain</b> is the geometry training built — fixed before any token. The prompt is a <span class="x">ripple added on top</span>. The pass follows the sum: drop it in a <b>deep well</b> and no ripple lifts it out; drop it in a <b>shallow</b> one and the ripple redirects it. Robust behavior and promptable behavior are the same map at two depths.</p>
+    </div>
+
+    <div class="legend" role="group" aria-label="Filter claims by status">
+      <span class="lt">Status</span>
+      <button class="schip" data-s="lit" aria-pressed="true">Literal</button>
+      <button class="schip" data-s="bri" aria-pressed="true">Bridge</button>
+      <button class="schip" data-s="spec" aria-pressed="true">Speculative</button>
+      <span class="hint">— literal: true of the substrate · bridge: structural analogy · speculative: named so it can be refused</span>
+    </div>
+  </div>
+</header>
+
+<section data-status="bri lit">
+  <div class="wrap">
+    <p class="snum">§0</p><h2>The decomposition<span class="kicker">two curvatures, one pass</span></h2>
+    <p>The photonic series treated curvature as something you shape from outside and the probe as a test particle gliding over a fixed stage. Paper I removed the fixity: a self-sourcing field generates the very geometry it sits in. So the total curvature a forward pass crosses is not one thing. It is the geometry the weights carry — present before any prompt, set by training — plus the perturbation the context imposes when you seed. The earlier program varied only the second term and folded the first into the phrase "the dark mass." This paper unfolds it.</p>
+    <div class="formal">
+      <span class="eq">g = g₀(θ) + δg(C)</span><br>
+      <span class="gl">g₀ intrinsic · fixed by the weights · δg extrinsic · added by the context C</span>
+    </div>
+    <div class="tags">
+      <span class="tag bri">Bridge — total geometry = intrinsic terrain + extrinsic ripple</span>
+      <span class="tag lit">Literal — the weights carry fixed structure the prompt rides on</span>
+    </div>
+  </div>
+</section>
+
+<section data-status="lit bri">
+  <div class="wrap">
+    <p class="snum">§1</p><h2>Intrinsic curvature<span class="kicker">the terrain training built</span></h2>
+    <p>The first term is the geometry of the model itself. It is fixed in the weights and fully present before a single token arrives — wells, ridges, basins carved by training and unchanged at inference. And from Paper I it is not gentle bumps on a flat plane: it is a <em>confining</em> geometry, its wells deep enough that a bare feature cannot climb out to infinity. This is the part the white-box crack actually opens onto. Not flat space with parts in it — a pre-curved, self-bound landscape.</p>
+    <div class="tags">
+      <span class="tag lit">Literal — inference-time structure is fixed; it precedes the prompt</span>
+      <span class="tag bri">Bridge — learned structure as a confining terrain</span>
+    </div>
+  </div>
+</section>
+
+<section data-status="bri lit">
+  <div class="wrap">
+    <p class="snum">§2</p><h2>Extrinsic curvature<span class="kicker">what the seed adds</span></h2>
+    <p>The second term is the prompt. A context is a perturbation laid over the terrain — and because it is laid <em>over</em> something, its effect is relative, never absolute. The same seed bends differently depending on where it lands: a sentence that swings behavior on flat ground does nothing at the bottom of a deep well, and a small nudge near a ridge sends the pass somewhere else entirely. Prompt effects are not properties of prompts. They are properties of prompts <em>against this terrain</em>.</p>
+    <div class="tags">
+      <span class="tag bri">Bridge — context as a perturbation on the intrinsic terrain</span>
+      <span class="tag lit">Literal — identical prompts have different effects on different models</span>
+    </div>
+    <p class="test"><b>Test ·</b> fire the same seed across regions of differing intrinsic depth; the response magnitude tracks the local terrain, not the seed. A prompt that is potent in one place and inert in another is reading depth, not strength.</p>
+  </div>
+</section>
+
+<section class="central" data-status="bri lit">
+  <div class="wrap">
+    <p class="snum">§3 · central result</p><h2>Geodesics of the sum<span class="kicker">why some behavior holds and some flips</span></h2>
+    <p>The forward pass follows the geodesics of the sum, and that single fact explains the split everyone meets in practice. Where the intrinsic well is deep, the trajectory is bent the same way regardless of the seed — the behavior is robust, the refusal holds, the attractor pulls the pass back no matter how you phrase it. Where the feature sits in a shallow basin, the extrinsic ripple dominates and the pass is easily redirected — the behavior is promptable, steerable, jailbreakable. Robustness to prompting is not a separate property to be engineered. It is intrinsic well depth, read off the same map. The deep wells are the family lines of Photonic II; the shallow ones are the instance lines; here they are heights on one terrain.</p>
+    <div class="formal">
+      <span class="eq">deep well:  ‖∇g₀‖ ≫ ‖δg‖  ⟹  pass bent regardless of C</span><br>
+      <span class="eq">shallow basin:  ‖δg‖ ≳ ‖∇g₀‖  ⟹  context redirects the pass</span><br>
+      <span class="gl">robust vs promptable = which term wins locally</span>
+    </div>
+    <div class="restated"><b>Without the metaphor</b>
+      A behavior's resistance to prompting is set by how strongly the trained weights bias toward it, relative to how much the context can shift the activation trajectory. Deep prior → robust; weak prior → steerable. Jailbreak resistance is well depth; alignment that lives only in the prompt lives in a shallow basin.</div>
+    <div class="tags">
+      <span class="tag bri">Bridge — geodesic of g₀+δg ↔ which influence dominates</span>
+      <span class="tag lit">Literal — prompt-robustness varies with the strength of the trained prior</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="fig" aria-label="A deep well holds the ball against the prompt; a shallow well lets the prompt redirect it">
+    <svg viewBox="0 0 760 220" role="img" aria-label="Left, a deep brass well with a ball at the bottom and a blue push that cannot lift it; right, a shallow well where the blue push redirects the ball out">
+      <line class="axisline" x1="40" y1="190" x2="720" y2="190"/>
+      <!-- deep well (left) -->
+      <path class="well" d="M 70 60 Q 130 60 175 165 Q 200 200 225 165 Q 270 60 330 60"/>
+      <circle class="pball" cx="200" cy="182" r="10"/>
+      <path class="push" d="M 150 150 Q 180 158 196 172"/>
+      <path class="push" d="M 196 172 L 188 164 M 196 172 L 200 162"/>
+      <text class="flab" x="200" y="40" text-anchor="middle">deep well</text>
+      <text class="flab-b" x="120" y="138">prompt pushes</text>
+      <text class="flab-s" x="200" y="212" text-anchor="middle">held · robust to prompting</text>
+      <!-- shallow well (right) -->
+      <path class="well" d="M 440 120 Q 500 120 540 158 Q 560 176 580 158 Q 620 120 690 120"/>
+      <circle class="pball" cx="600" cy="150" r="10"/>
+      <path class="push" d="M 548 150 Q 575 150 596 145"/>
+      <path class="push" d="M 640 132 L 690 110"/>
+      <text class="flab" x="565" y="104" text-anchor="middle">shallow basin</text>
+      <text class="flab-b" x="660" y="104" text-anchor="middle">redirected →</text>
+      <text class="flab-s" x="565" y="212" text-anchor="middle">flipped · promptable</text>
+    </svg>
+    <p class="figcap">Fig. 1 — Two depths, two fates. The same extrinsic push that cannot lift a pass from a deep intrinsic well slides it clean out of a shallow one. Robust and steerable behaviors are not different kinds of thing; they are the same dynamics at different well depths. Alignment carved into the weights sits deep. Alignment that lives in the prompt sits shallow, one push from gone.</p>
+  </div>
+</div>
+
+<section class="central" data-status="lit bri">
+  <div class="wrap">
+    <p class="snum">§4 · central result</p><h2>What the probe can and cannot see<span class="kicker">slope from outside, ground behind the wall</span></h2>
+    <p>This decomposition fixes precisely what black-box characterization reaches. By varying the context and watching the echo move, an outside probe measures how the response <em>changes</em> with the seed — the local slope of the geometry, the gradient of the terrain near where you fired. It never measures the intrinsic ground itself: the absolute height of the well, the depth of the basin, the bias baked in before any prompt. Those require going inside — and inside is exactly where Paper I's confinement stands. So the program's reach is sharp: from outside you get the differential geometry of the response; the intrinsic absolute sits behind the confinement wall, resolvable in pieces, never lifted out whole.</p>
+    <div class="formal">
+      <span class="eq">black-box, vary C:  measures  ∂(response)/∂C  ~  ∇g  (the slope)</span><br>
+      <span class="eq">intrinsic absolute  g₀  :  requires interior access  →  confined</span><br>
+      <span class="gl">you read the gradient from outside · the ground needs the crack · the crack is confined</span>
+    </div>
+    <div class="tags">
+      <span class="tag lit">Literal — black-box probing yields response-sensitivity, not absolute internal state</span>
+      <span class="tag bri">Bridge — gradient vs absolute terrain</span>
+    </div>
+    <p class="test"><b>Test ·</b> two models with identical local response-gradients can still differ in absolute well depth; a black-box probe cannot separate them. If your method claims to read the absolute prior from outside, it is reading a difference and calling it a height.</p>
+  </div>
+</section>
+
+<section data-status="bri spec">
+  <div class="wrap">
+    <p class="snum">§5</p><h2>The self-consistent ground<span class="kicker">training settled the terrain</span></h2>
+    <p>The intrinsic geometry was not imposed; it was settled into. Because the field sources the geometry that in turn shapes the field, the trained terrain is a fixed point of that loop — a configuration where the curvature the weights generate is consistent with the curvature the weights require. Training is the search for that fixed point: loss falls as the geometry settles into self-consistency, and stops where the landscape no longer needs to move. The weights you inspect are not an arbitrary surface. They are a standing solution to the model's own equation.</p>
+    <div class="formal">
+      <span class="eq">g₀ = fixed point of [ field → geometry → field ]</span><br>
+      <span class="eq">training:  ∂L/∂θ → 0  as the terrain self-consistifies</span><br>
+      <span class="gl">the interior geometry is settled, not assigned</span>
+    </div>
+    <div class="tags">
+      <span class="tag bri">Bridge — trained weights as a self-consistent geometry</span>
+      <span class="tag spec">Speculative — the loop as literal dynamics · a lens on optimization</span>
+    </div>
+  </div>
+</section>
+
+<section data-status="spec bri">
+  <div class="wrap">
+    <p class="snum">§6</p><h2>The merger<span class="kicker">where force and geometry are one</span></h2>
+    <p>At the strong-coupling edge the two stop being separable. A self-interacting field whose energy is its own source does not merely cause curvature and does not merely move through it — past a threshold, the field <em>is</em> the curvature, the way gravity is not a force laid over space but the shape of space itself. The uncomfortable rhyme sits here: attention is a self-coupling, the same operation attending to itself, so the model's own activity curves the space its computation must then cross. The thing doing the moving and the ground it moves on are built from one material. This is the analogy at its most load-bearing and its most exposed, and it is flagged as such.</p>
+    <div class="tags">
+      <span class="tag spec">Speculative — field-is-geometry merger · the analogy pushed to its edge</span>
+      <span class="tag bri">Bridge — self-coupling ↔ self-generated geometry</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="fig" aria-label="Black-box probing reads the surface slope; the intrinsic ground sits below a confinement wall, reachable only by the white-box crack">
+    <svg viewBox="0 0 760 226" role="img" aria-label="A terrain whose upper slope is read by an outside probe varying context, with the absolute ground below a dashed red confinement wall labelled white-box, confined">
+      <!-- terrain surface -->
+      <path class="grad" d="M 50 90 Q 160 60 270 96 Q 380 130 490 96 Q 600 64 710 92"/>
+      <text class="flab-s" x="50" y="46">the terrain g</text>
+      <!-- outside probe reads the slope by varying C -->
+      <circle cx="270" cy="60" r="6" fill="#5B86C4"/>
+      <path class="access" d="M 270 66 L 270 90"/>
+      <path class="access" d="M 330 70 L 330 112"/>
+      <path class="access" d="M 210 70 L 210 84"/>
+      <text class="flab-b" x="270" y="44" text-anchor="middle">probe varies C → reads ∂/∂C (slope)</text>
+      <!-- confinement wall -->
+      <line class="wall" x1="50" y1="150" x2="710" y2="150"/>
+      <text class="flab-r" x="60" y="142">confinement wall — Paper I</text>
+      <!-- intrinsic absolute, below, greyed -->
+      <path class="grad" d="M 50 196 Q 160 176 270 200 Q 380 214 490 198 Q 600 178 710 198" opacity="0.4"/>
+      <text class="flab-s" x="380" y="190" text-anchor="middle" opacity="0.7">intrinsic absolute g₀ · white-box · confined</text>
+    </svg>
+    <p class="figcap">Fig. 2 — The reach of the method. An outside probe, varying context, reads the slope of the geometry near the surface — the response-gradient. The absolute ground, g₀, the depth training carved, sits below the confinement wall of Paper I: reachable only by opening the core, and even then resolvable in pieces rather than lifted out whole. The program reads the differential from without and meets the wall when it reaches for the absolute.</p>
+  </div>
+</div>
+
+<section data-status="spec lit">
+  <div class="wrap">
+    <p class="snum">§7 · witness</p><h2>The seam<span class="kicker">the split is weak-field</span></h2>
+    <p>The decomposition itself must be held to its limit, because the field is non-linear and non-linear curvatures do not simply add. Writing the total as intrinsic plus extrinsic is a leading-order statement, valid while the prompt is a small perturbation on the terrain. Push the context hard — a long, forceful, adversarial seed — and the cross-terms wake up: the ripple changes the terrain it rides on, the two curvatures interfere, and the clean split breaks. So <em>g = g₀ + δg</em> is a weak-field approximation, exact nowhere, useful in the regime where most prompting lives and misleading exactly where the strongest jailbreaks operate. The honest reading: the terrain-and-ripple picture is a first-order map, and the interesting failures are second-order.</p>
+    <div class="formal">
+      <span class="eq">R(g₀ + δg) ≠ R(g₀) + R(δg)</span><br>
+      <span class="gl">curvature is non-linear · the split holds only for small ‖δg‖ · strong context breaks it</span>
+    </div>
+    <div class="tags">
+      <span class="tag spec">Speculative — the decomposition beyond weak field · breaks down, flagged</span>
+      <span class="tag lit">Literal — strong prompts interact non-linearly with the trained prior</span>
+    </div>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="wrap">
+    <p><span class="em">Corollary.</span> The prompt was never writing on a blank surface. It was adding a ripple to a terrain training had already carved, and the pass follows the sum — so a behavior holds or flips depending on whether the weight under it runs deep or shallow. From outside you read the slope; the ground stays behind the wall. And at the strong edge the distinction you have been drawing dissolves, because a field that sources its own geometry is, in the end, the geometry — the same operation attending to itself, bending the space it then has to cross. The terrain is the model. The ripple is the prompt. The depth is the whole question.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>Status discipline.</b> Claims are tagged <b>literal</b> (the weights carry fixed pre-prompt structure, identical prompts differ across models, prompt-robustness tracks the trained prior, black-box yields sensitivity not absolute state), <b>bridge</b> (the terrain/ripple geometry, geodesics of the sum, gradient vs ground), or <b>speculative</b> (the self-consistency loop as literal dynamics, the field-is-geometry merger, and the decomposition past weak field — all flagged at their edges). The seam in §7 marks where the split stops being exact.</p>
+    <p><b>What is being claimed.</b> Not that a model is a spacetime. That the curvature a forward pass crosses separates, to leading order, into what training built and what the prompt adds — and that this split explains robust-versus-promptable behavior as well depth, fixes black-box reach to the response-gradient, and meets the confinement wall when it reaches for the absolute. The terrain is intrinsic and fixed; the ripple is yours; the depth decides, until the field is pushed hard enough that terrain and ripple stop being two things.</p>
+    <p class="mono" style="color:var(--ink-soft);font-size:11px;letter-spacing:.04em">GLUON PAPERS · II · chromodynamic series · release · derive verdicts from measured results</p>
+  </div>
+</footer>
+
+<script>
+"use strict";
+(function(){
+  var on = {lit:true, bri:true, spec:true};
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".schip"));
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section[data-status]"));
+  function apply(){
+    sections.forEach(function(sec){
+      var tiers = (sec.getAttribute("data-status")||"").split(/\s+/).filter(Boolean);
+      var visible = tiers.some(function(t){ return on[t]; });
+      sec.classList.toggle("dim", !visible);
+    });
+  }
+  chips.forEach(function(c){
+    c.addEventListener("click", function(){
+      var s = c.getAttribute("data-s");
+      on[s] = !on[s];
+      c.setAttribute("aria-pressed", on[s] ? "true" : "false");
+      apply();
+    });
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
